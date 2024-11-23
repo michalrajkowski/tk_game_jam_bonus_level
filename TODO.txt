@@ -1,0 +1,14 @@
+Lich Dungeon
+
+(A) Heroes on screen:
+    + draw player characters
+- load players textures
+
+(B) Turn System:
+- Heroes decide what they want to do
+- Player (lich) can do some actions
+- Resolving - skipable animations + effects?
+
+(And repeat?)
+
+(C) Heroes Thoughts / Decision making system
