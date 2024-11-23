@@ -5,7 +5,7 @@
 # - cards with targets or no targets?
 # - for now basic actions (maybe they upgrade?)
 import pyxel
-
+LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget ex ac purus scelerisque suscipit ac ut turpis. Quisque ut massa posuere, ultrices nunc quis, sagittis tortor. Cras ac leo enim. Pellentesque ut viverra augue, et maximus orci. Ut non mollis elit. Donec sed feugiat ligula, ut rhoncus turpis. Nulla elementum a dui accumsan vulputate. Praesent sem lacus, dignissim id eros vitae, ultricies volutpat quam. Etiam non vehicula ex. "
 (CARD_W, CARD_H) = (60, 90)
 MIN_W = 10
 HIDDEN_H = 40
@@ -68,6 +68,17 @@ class CardManager():
         pyxel.rect(card_x, card_y, CARD_W, CARD_H, 0)
         pyxel.rectb(card_x, card_y, CARD_W, CARD_H, 7)
 
+        this_card : Card = self.cards_in_hand[card_index]
+
+        # Draw card name
+        pyxel.text(card_x+2, card_y+2, this_card.name, 7)
+
+        ART_H = 40
+        # Draw card art
+        pyxel.rect(card_x+1, card_y+2+7, CARD_W-2, ART_H, 4)
+
+        # Draw card description
+        pyxel.text(card_x+2, card_y+2+7+ART_H+1, this_card.description, 7)
         
 
         
@@ -116,9 +127,12 @@ class CardManager():
             self.card_show_timers[self.hovered_card_index] = CARD_SHOW_TIME
 
 class Card():
-    def __init__(self, name : str = ""):
+    def __init__(self, name : str = "", descript : str = LOREM):
         self.name : str = name 
+        self.description = descript
+        self.description = split_text_into_lines(self.description, CARD_W-4)
         pass
+
 
 class DefaultCard(Card):
     def __init__(self):
@@ -129,4 +143,30 @@ class SkipCard(Card):
     def __init__(self):
         super().__init__()
         self.name = "Skip Turn"
-    
+
+def split_text_into_lines(text, card_w):
+    current_line = []
+    current_width = 0
+    result_lines = []
+
+    for char in text:
+        # Calculate the width of the character plus a space (except for the last character on the line)
+        char_width = 3
+        space_width = 1 if len(current_line) > 0 else 0  # No space before the first character
+
+        # Check if adding this character would exceed the line width
+        if current_width + char_width + space_width <= card_w:
+            current_line.append(char)
+            current_width += char_width + space_width
+        else:
+            # If the current line is full, save it and start a new line
+            result_lines.append(''.join(current_line))
+            current_line = [char]
+            current_width = char_width
+
+    # Add the last line if there are any characters left
+    if current_line:
+        result_lines.append(''.join(current_line))
+
+    # Join the lines with '\n' and return the result as a single string
+    return '\n'.join(result_lines)    
