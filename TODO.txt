@@ -19,8 +19,8 @@ Lich Dungeon
 - some can act????
 
 (E) Player card system?
-- cards / actions on hand
-- hover on card to select it (it will slide up? (showing description?))
-- card has description what they do?
 - cards with targets or no targets?
 - for now basic actions (maybe they upgrade?)
+
+- (HOLD mouse like in hearthstone to play it)
+- card playing mechanics - if player press / hold - it can choose the target like in hearthstone (card stays selected )

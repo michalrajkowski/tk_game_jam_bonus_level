@@ -49,7 +49,6 @@ class HeroManager():
         
 class Hero():
     def __init__(self, hero_type : HeroEnum,name : str, current_stats : dict[HeroStats, int], max_stats : dict[HeroStats, int]):
-        print("INIT HERO")
         self.hero_type : HeroEnum = hero_type
         self.name :str = name
         self.current_stats : dict[HeroStats, int] = current_stats
@@ -71,5 +70,4 @@ class Hero():
         )
     
     def set_decision(self, decision : Decision):
-        print("SETTING DECISION : ")
         self.decision = decision

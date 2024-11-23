@@ -7,7 +7,6 @@ class DecisionManager():
         self.hero_manager : HeroManager = None
         pass
     def make_decisions(self):
-        print("MAKING DECISION")
         # Get decision for each player?
         
         # For each hero:
@@ -30,7 +29,6 @@ class DecisionManager():
         
         # Select one decision randomly, considering the weights
         selected_decision = random.choices(decisions, weights=weights, k=1)[0]
-        print(selected_decision)
         hero.set_decision(selected_decision)
 
     def get_default_decisions(self):

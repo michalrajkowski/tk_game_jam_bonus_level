@@ -5,32 +5,37 @@
 # - cards with targets or no targets?
 # - for now basic actions (maybe they upgrade?)
 import pyxel
+import random
 LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget ex ac purus scelerisque suscipit ac ut turpis. Quisque ut massa posuere, ultrices nunc quis, sagittis tortor. Cras ac leo enim. Pellentesque ut viverra augue, et maximus orci. Ut non mollis elit. Donec sed feugiat ligula, ut rhoncus turpis. Nulla elementum a dui accumsan vulputate. Praesent sem lacus, dignissim id eros vitae, ultricies volutpat quam. Etiam non vehicula ex. "
 (CARD_W, CARD_H) = (60, 90)
 MIN_W = 10
 HIDDEN_H = 40
 CARD_SHOW_TIME = 0.3
+GRABBED_PLAY_H = 30
+
 class CardManager():
     def __init__(self):
         self.cards_in_hand : list[Card] = []
         self.card_show_timers :  list[float] = []
         self.hovered_card_index : int = None
         self.selected_card : Card = None
+        self.grabbed_card : Card = None
         self.SCREEN_W = None
         self.SCREEN_H = None
-        self.load_example_hand(10)
+        self.load_example_hand(3)
     
     def load_example_hand(self, number):
         for i in range(number):
-            card : Card = DefaultCard()
+            if (random.random() > 0.5):
+                card : Card = DefaultCard()
+            else:
+                card : Card = SkipCard()
             self.cards_in_hand.append(card)
             self.card_show_timers.append(0.0)
     # Draw cards in hand.
     # draws them from middle
     def draw_cards(self):
         total_cards = len(self.cards_in_hand)
-        if total_cards == 0:
-            return
         
         # Calculate the total width required for the cards without overlap
         total_cards_width = total_cards * CARD_W
@@ -45,7 +50,9 @@ class CardManager():
         else:
             # If there's enough space, spread them out
             card_spacing = available_space // (total_cards - 1) if total_cards > 1 else 0
-        
+
+        if card_spacing > 0:
+            card_spacing = 0
         # Calculate the starting x position to center the cards
         start_draw_x = (self.SCREEN_W - (total_cards * CARD_W + (total_cards - 1) * card_spacing)) // 2
         
@@ -56,19 +63,35 @@ class CardManager():
             lerp_percent = timer / CARD_SHOW_TIME  # Normalize the timer to a 0-1 range
             start_draw_y = self.SCREEN_H - (CARD_H)*(lerp_percent) - (HIDDEN_H)*(1.0 - 1.0*lerp_percent) 
             card_x = start_draw_x + i * (CARD_W + card_spacing)
-            self.draw_one_card(card_x, start_draw_y, i)
+            if (self.grabbed_card != None):
+                start_draw_y = self.SCREEN_H - HIDDEN_H
+            self.draw_one_card(card_x, start_draw_y, self.cards_in_hand[i])
             if (self.card_show_timers[i] == CARD_SHOW_TIME):
                 (special_x, special_y, special_index) = (card_x, start_draw_y, i)
+        
         # Draw special card for more readability:
         if special_index != -1:
-            self.draw_one_card(special_x, special_y, special_index)
+            self.draw_one_card(special_x, special_y, self.cards_in_hand[special_index])
+
+        if self.grabbed_card != None:
+            # Draw grabbed card:
+            self.draw_one_card(pyxel.mouse_x, pyxel.mouse_y, self.grabbed_card)
+            pass
 
 
-    def draw_one_card(self, card_x, card_y, card_index):
+    def draw_one_card(self, card_x, card_y, card):
+        card_border_color = 7
+        if self.grabbed_card == card:
+            card_y = max(card_y, self.SCREEN_H +  - GRABBED_PLAY_H - CARD_H)
+            # Decide card border color:
+            if card_y == self.SCREEN_H +  - GRABBED_PLAY_H - CARD_H:
+                card_border_color = 11# GREEN
+            else:
+                card_border_color = 10 # YELLOW
+        
         pyxel.rect(card_x, card_y, CARD_W, CARD_H, 0)
-        pyxel.rectb(card_x, card_y, CARD_W, CARD_H, 7)
-
-        this_card : Card = self.cards_in_hand[card_index]
+        pyxel.rectb(card_x, card_y, CARD_W, CARD_H, card_border_color)
+        this_card : Card = card
 
         # Draw card name
         pyxel.text(card_x+2, card_y+2, this_card.name, 7)
@@ -80,6 +103,7 @@ class CardManager():
         # Draw card description
         pyxel.text(card_x+2, card_y+2+7+ART_H+1, this_card.description, 7)
         
+        
 
         
     
@@ -88,8 +112,6 @@ class CardManager():
         (mouse_x, mouse_y) = (pyxel.mouse_x, pyxel.mouse_y)
         # Find if any card is highlited?
         total_cards = len(self.cards_in_hand)
-        if total_cards == 0:
-            return
         
         # Calculate the total width required for the cards without overlap
         total_cards_width = total_cards * CARD_W
@@ -105,6 +127,8 @@ class CardManager():
             # If there's enough space, spread them out
             card_spacing = available_space // (total_cards - 1) if total_cards > 1 else 0
         
+        if card_spacing > 0:
+            card_spacing = 0
         # Calculate the starting x position to center the cards
         start_draw_x = (self.SCREEN_W - (total_cards * CARD_W + (total_cards - 1) * card_spacing)) // 2
         start_draw_y = self.SCREEN_H - HIDDEN_H
@@ -123,8 +147,38 @@ class CardManager():
             if self.card_show_timers[i] <= 0.0:
                 self.card_show_timers[i] = 0.0
         
-        if self.hovered_card_index != None:
-            self.card_show_timers[self.hovered_card_index] = CARD_SHOW_TIME
+        if self.grabbed_card != None:
+            print(mouse_y)
+            if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) == False:
+                if mouse_y < self.SCREEN_H - CARD_H - GRABBED_PLAY_H:
+                #play card
+                    print("PLAY CARD")
+                    self.selected_card = self.grabbed_card
+                    self.grabbed_card = None
+                    return
+                else:
+                    print("INSERT CARD")
+                    place_index = self.hovered_card_index
+                    if place_index == None:
+                        if mouse_x < self.SCREEN_W / 2:
+                            place_index = 0
+                        else:
+                            place_index = len(self.cards_in_hand)
+                    self.cards_in_hand.insert(place_index, self.grabbed_card)
+                    self.card_show_timers.insert(place_index, CARD_SHOW_TIME)
+                    self.grabbed_card = None
+                    return
+            return
+        if self.hovered_card_index == None:
+            return
+        
+        self.card_show_timers[self.hovered_card_index] = CARD_SHOW_TIME
+        # Test for card grab
+        if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT):
+            self.grabbed_card = self.cards_in_hand[self.hovered_card_index]
+            self.cards_in_hand.remove(self.grabbed_card)
+            del self.card_show_timers[self.hovered_card_index]
+
 
 class Card():
     def __init__(self, name : str = "", descript : str = LOREM):
