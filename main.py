@@ -10,6 +10,7 @@ from enum import Enum, auto
 from decision_manager import DecisionManager, HeroEnum
 from hero_manager import HeroManager
 from room_manager import RoomManager, Room
+from card_manager import CardManager
 
 # CONSTANTS:
 # Box - x, y, w, h
@@ -29,15 +30,19 @@ class State(Enum):
 
 class App:
     def __init__(self):
-        pyxel.init(SCREEN_W, SCREEN_H, title="Hello Pyxel")
+        pyxel.init(SCREEN_W, SCREEN_H, title="Lich Game")
+        pyxel.mouse(True)
         pyxel.load("assets/assets.pyxres")
 
         self.game_state = State.HEROES_THINK
         self.decision_manager : DecisionManager = DecisionManager()
         self.hero_manager : HeroManager = HeroManager()
         self.room_manager : RoomManager = RoomManager()
+        self.card_manager : CardManager = CardManager()
 
         self.decision_manager.hero_manager = self.hero_manager
+        self.card_manager.SCREEN_W = SCREEN_W
+        self.card_manager.SCREEN_H = SCREEN_H
 
         pyxel.run(self.update, self.draw)
 
@@ -54,6 +59,7 @@ class App:
         
         self.draw_heroes()
         self.draw_rooms_left()
+        self.draw_player_cards()
         # Load Heroes on screen
 
     def draw_heroes(self):
@@ -90,7 +96,12 @@ class App:
         current_room = self.room_manager.current_room_index
         pyxel.rectb(start_x + current_room*(room_w +1)-1, 0, 18, 18, 8)
 
+    def draw_player_cards(self):
+        pyxel.rectb(0, SCREEN_H - 50, SCREEN_W, 50, 7)
+        self.card_manager.draw_cards()
+
     def simulate_turn(self):
+        self.card_manager.simulate()
         # Enum turn step?
         # Additional thing for anims?
         if (self.game_state == State.HEROES_THINK):
@@ -102,13 +113,6 @@ class App:
         # (Skipable animations?)
 
         # Player can do sth
-        if (self.game_state == State.PLAYERS_ACT):
-            # Player can play cards to influence what is happening?
-
-            # TODO: TEMPORARY SKIP ON MOUSECLICK
-            if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) or pyxel.btn(pyxel.KEY_SPACE):
-                self.game_state = State.HEROES_THINK
-                return
 
         # Resolving action?
 
