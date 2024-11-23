@@ -1,25 +1,12 @@
 from enum import Enum, auto
-from decisions import Decision
+from decisions import Decision, NoneDecision, HeroEnum
 
 class HeroStats(Enum):
     ANGER = auto()
     FEAR = auto()
     BLOOD = auto()
 
-class HeroEnum(Enum):
-    WIZARD = auto()
-    ROGUE = auto()
-    WARRIOR = auto()
-    DEFAULT = auto()
-
 class HeroManager():
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-    
     def __init__(self):
         # Generate Heroes
         self.hero_list : dict[HeroEnum, Hero] = {}
@@ -62,11 +49,14 @@ class HeroManager():
         
 class Hero():
     def __init__(self, hero_type : HeroEnum,name : str, current_stats : dict[HeroStats, int], max_stats : dict[HeroStats, int]):
+        print("INIT HERO")
         self.hero_type : HeroEnum = hero_type
         self.name :str = name
         self.current_stats : dict[HeroStats, int] = current_stats
         self.max_stats : dict[HeroStats, int] = max_stats
         self.decision : Decision = None
+        self.set_decision(NoneDecision())
+        
 
     def __str__(self):
         # Format stats for better readability
@@ -79,3 +69,7 @@ class Hero():
             f"Current Stats: {current_stats_str}\n"
             f"Max Stats: {max_stats_str}"
         )
+    
+    def set_decision(self, decision : Decision):
+        print("SETTING DECISION : ")
+        self.decision = decision

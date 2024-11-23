@@ -1,14 +1,34 @@
 # Decision of what he wants to do
+from enum import Enum, auto
+
+class HeroEnum(Enum):
+    WIZARD = auto()
+    ROGUE = auto()
+    WARRIOR = auto()
+    DEFAULT = auto()
+
 class Decision():
     def __init__(self, weigth=5):
         from hero_manager import HeroEnum
+        self.non_decision = False
         self.weigth = weigth
-        self.description_short = ""
+        self.description_short = "DEFAULT DECISION"
         self.description_box : dict[HeroEnum, list[str]] = {}
+        self.initialize_weigth()
+
+    # Change it's weigth based on some conditions???
+    def initialize_weigth(self):
+        pass
 
     def __str__(self):
         return f"{self.description_short}"
-        
+    
+class NoneDecision(Decision):
+    def __init__(self):
+        super().__init__()
+        self.description_short = "EMPTY DECISION"
+        self.non_decision = True 
+
 class Rest_Decision(Decision):
     def __init__(self):
         from hero_manager import HeroEnum
