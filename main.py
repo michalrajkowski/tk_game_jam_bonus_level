@@ -9,6 +9,7 @@ import pyxel
 from enum import Enum, auto
 from decision_manager import DecisionManager, HeroEnum
 from hero_manager import HeroManager
+from room_manager import RoomManager, Room
 
 # CONSTANTS:
 # Box - x, y, w, h
@@ -34,6 +35,7 @@ class App:
         self.game_state = State.HEROES_THINK
         self.decision_manager : DecisionManager = DecisionManager()
         self.hero_manager : HeroManager = HeroManager()
+        self.room_manager : RoomManager = RoomManager()
 
         self.decision_manager.hero_manager = self.hero_manager
 
@@ -51,6 +53,7 @@ class App:
         pyxel.cls(0)
         
         self.draw_heroes()
+        self.draw_rooms_left()
         # Load Heroes on screen
 
     def draw_heroes(self):
@@ -70,6 +73,22 @@ class App:
         pyxel.text(HERO_SLOTS[2][0], HERO_SLOTS[2][1] - 5, hero_manager.hero_list[HeroEnum.WARRIOR].decision.description_short, 7)
         decision_decscription = hero_manager.hero_list[HeroEnum.WIZARD].decision.description_short
         pyxel.text(0, 0, decision_decscription, 7)
+
+    def draw_rooms_left(self):
+        # Draw on top?
+        number_of_rooms = self.room_manager.max_rooms
+        room_w = 16
+        # Calculate start draw x:
+        start_x = int((SCREEN_W - number_of_rooms*(room_w +1)) / 2)
+        # Actualy draw them with 1 px left between
+        for i in range(number_of_rooms):
+            # Draw one room:
+            this_room : Room = self.room_manager.rooms_list[i]
+            (u, v, w, h) = (this_room.room_icon[0], this_room.room_icon[1], this_room.room_icon[2], this_room.room_icon[3])
+            pyxel.blt(start_x + i*(room_w +1), 1, 0, u, v, w, h, 0)
+        # Draw mark on current room
+        current_room = self.room_manager.current_room_index
+        pyxel.rectb(start_x + current_room*(room_w +1)-1, 0, 18, 18, 8)
 
     def simulate_turn(self):
         # Enum turn step?

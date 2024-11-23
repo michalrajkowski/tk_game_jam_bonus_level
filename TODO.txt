@@ -5,10 +5,15 @@ Lich Dungeon
 - load players textures
 
 (B) Turn System:
-- Heroes decide what they want to do
++- Heroes decide what they want to do
 - Player (lich) can do some actions
 - Resolving - skipable animations + effects?
 
 (And repeat?)
 
 (C) Heroes Thoughts / Decision making system
+
+(D) Room manager
+- each room has objects
+- each object has traits?
+- some can act????
