@@ -18,7 +18,7 @@ from game_manager import State
 
 HUD_ZONE_H = 50
 OBJECT_ZONE_H = 80 
-PLAYERS_ZONE_H = 110
+PLAYERS_ZONE_H = 100
 
 SCREEN_W, SCREEN_H = (300, 300)
 HERO_SIZE = (40, 80)
@@ -43,6 +43,8 @@ class App:
         pyxel.mouse(True)
         pyxel.load("assets/assets.pyxres")
 
+        self.current_frame = 0.0
+
         self.game_state = State.HEROES_THINK
         self.decision_manager : DecisionManager = DecisionManager()
         self.hero_manager : HeroManager = HeroManager()
@@ -52,13 +54,17 @@ class App:
         self.decision_manager.hero_manager = self.hero_manager
         self.card_manager.SCREEN_W = SCREEN_W
         self.card_manager.SCREEN_H = SCREEN_H
+        self.card_manager.OBJECT_SLOTS = OBJECT_SLOTS
+        self.card_manager.PLAYER_SLOTS = HERO_SLOTS
+        self.card_manager.OBJECT_SIZE = OBJECT_SIZE
+        self.card_manager.HERO_SIZE = HERO_SIZE
 
         pyxel.run(self.update, self.draw)
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
-
+        self.current_frame += 1.0
         self.simulate_turn()
         # Simulate the turn?
         # - 
@@ -75,6 +81,7 @@ class App:
 
         if (self.game_state == State.CARD_CHOOSING_TARGETS):
             self.card_manager.draw_arrow()
+            self.card_manager.draw_ghastly_selects()
 
         if (self.game_state == State.PLAYERS_ACT):
             self.draw_player_cards()

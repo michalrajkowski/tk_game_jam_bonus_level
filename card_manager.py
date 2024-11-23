@@ -22,8 +22,13 @@ class CardManager():
         self.hovered_card_index : int = None
         self.selected_card : Card = None
         self.grabbed_card : Card = None
+        
         self.SCREEN_W = None
         self.SCREEN_H = None
+        self.OBJECT_SLOTS = None
+        self.PLAYER_SLOTS = None
+        self.OBJECT_SIZE = None
+        self.HERO_SIZE = None
 
         self.game_manager = game_manager
 
@@ -43,16 +48,40 @@ class CardManager():
     # Draw cards in hand.
     # draws them from middle
     def draw_ghastly_selects(self):
-        objects_to_highlight = []
+        animation_state = (int(self.game_manager.current_frame)%40)/2 - 10
         # Draws indicators around valid targets
         if self.selected_card.can_target_players:
             # Draw indicator around each player
-            pass
+            for i in range(len(self.PLAYER_SLOTS)):
+                # Draw highlight around player:
+                slot = self.PLAYER_SLOTS[i]
+                pyxel.rectb(slot[0] - animation_state, slot[1]- animation_state, self.HERO_SIZE[0]+animation_state*2, self.HERO_SIZE[1]+animation_state*2, 7)
         if self.selected_card.can_target_objects:
             # Daw indicator around each object
-            pass
-
+            for i in range(len(self.OBJECT_SLOTS)):
+                # Draw highlight around player:
+                slot = self.OBJECT_SLOTS[i]
+                pyxel.rectb(slot[0] - animation_state, slot[1]- animation_state, self.OBJECT_SIZE[0]+animation_state*2, self.OBJECT_SIZE[1]+animation_state*2, 7)
+            
+    def is_mouse_in_space(self, x,y,space):
+        if space[0]<= x <= space[0]+space[2] and space[1] <= y <= space[1] + space[3]:
+            return True
+        return False
     def is_valid_target(self):
+        if self.selected_card.can_target_players:
+            # Draw indicator around each player
+            for i in range(len(self.PLAYER_SLOTS)):
+                # Draw highlight around player:
+                if (self.is_mouse_in_space(pyxel.mouse_x, pyxel.mouse_y, self.PLAYER_SLOTS[i])):
+                    return True
+                
+        if self.selected_card.can_target_objects:
+            # Daw indicator around each object
+            # Draw indicator around each player
+            for i in range(len(self.OBJECT_SLOTS)):
+                # Draw highlight around player:
+                if (self.is_mouse_in_space(pyxel.mouse_x, pyxel.mouse_y, self.OBJECT_SLOTS[i])):
+                    return True
         return False
     def unselect_card(self, card):
         place_index = 0
@@ -69,7 +98,7 @@ class CardManager():
         if self.is_valid_target():
             color = COLOR_OK
         # Draw line with arrow between mouse and played card
-        pyxel.line(int(self.SCREEN_W/2), self.SCREEN_H - CARD_H - GRABBED_PLAY_H, mouse_x, mouse_y, color)
+        pyxel.line(int(self.SCREEN_W/2), self.SCREEN_H - CARD_H, mouse_x, mouse_y, color)
 
     def draw_cards(self, shrinked = False):
         total_cards = len(self.cards_in_hand)
@@ -120,7 +149,7 @@ class CardManager():
                 self.draw_one_card(pyxel.mouse_x, pyxel.mouse_y, self.grabbed_card)
                 pass
         if self.selected_card != None:
-            self.draw_one_card(int(self.SCREEN_W/2 - CARD_W/2), self.SCREEN_H - CARD_H - GRABBED_PLAY_H, self.selected_card)
+            self.draw_one_card(int(self.SCREEN_W/2 - CARD_W/2), self.SCREEN_H - CARD_H, self.selected_card)
 
 
     def draw_one_card(self, card_x, card_y, card):
