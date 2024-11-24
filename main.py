@@ -8,7 +8,7 @@
 import pyxel
 from enum import Enum, auto
 from decision_manager import DecisionManager, HeroEnum
-from hero_manager import HeroManager
+from hero_manager import HeroManager, HeroStats
 from room_manager import RoomManager, Room
 from card_manager import CardManager
 from game_manager import State
@@ -220,19 +220,33 @@ class App:
             pyxel.blt(HERO_SLOTS[2][0], HERO_SLOTS[2][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
             # pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 0, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3])
 
-        """
-        wizard_sprite = ROGUE_IMAGES[0]
-        pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
-
-        wizard_sprite = WARIOR_IMAGE[0]
-        pyxel.blt(HERO_SLOTS[2][0], HERO_SLOTS[2][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
-        """
+        hero_manager = self.hero_manager
+        # Draw hero stats:
+        self.draw_hero_stats(HERO_SLOTS[0][0]+40, HERO_SLOTS[0][1]+10, hero_manager.hero_list[HeroEnum.WIZARD])
+        self.draw_hero_stats(HERO_SLOTS[1][0]+40, HERO_SLOTS[1][1]+10, hero_manager.hero_list[HeroEnum.ROGUE])
+        self.draw_hero_stats(HERO_SLOTS[2][0]+40, HERO_SLOTS[2][1]+10, hero_manager.hero_list[HeroEnum.WARRIOR])
 
         # Draw heroes decisions (later icons might be used for this as well?)
-        hero_manager = self.hero_manager
         pyxel.text(HERO_SLOTS[0][0], HERO_SLOTS[0][1] - 5, "Plan:" + hero_manager.hero_list[HeroEnum.WIZARD].decision.description_short, 13)
         pyxel.text(HERO_SLOTS[1][0], HERO_SLOTS[1][1] - 5, "Plan:" + hero_manager.hero_list[HeroEnum.ROGUE].decision.description_short, 13)
         pyxel.text(HERO_SLOTS[2][0], HERO_SLOTS[2][1] - 5, "Plan:" + hero_manager.hero_list[HeroEnum.WARRIOR].decision.description_short, 13)
+
+    def draw_hero_stats(self, x, y, hero):
+        # Draw name, and 3 atributes?
+        pyxel.text(x,y,hero.name, 5)
+        blood_value = 1
+        fear_value = 1
+        anger_value = 1
+        pyxel.text(x+2,y+8,"Blood", 1)
+        pyxel.rect(x+3, y+14, hero.max_stats[HeroStats.BLOOD]*3, 2, 1)
+        pyxel.rect(x+3, y+14, hero.current_stats[HeroStats.BLOOD]*3, 2, 8)
+        pyxel.text(x+2,y+20,"Fear", 1)
+        pyxel.rect(x+3, y+26, hero.max_stats[HeroStats.FEAR]*3, 2, 1)
+        pyxel.rect(x+3, y+26, hero.current_stats[HeroStats.FEAR]*3, 2, 2)
+        pyxel.text(x+2,y+32,"Anger", 1)
+        pyxel.rect(x+3, y+38, hero.max_stats[HeroStats.ANGER]*3 , 2, 1)
+        pyxel.rect(x+3, y+38, hero.current_stats[HeroStats.ANGER]*3 , 2, 9)
+
 
     def draw_hud(self):
         # DRAW HUD BOX

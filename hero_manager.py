@@ -14,32 +14,32 @@ class HeroManager():
         self.animation_handler : AnimationHandler = animation_handler
         self.PLAYER_SLOTS = PLAYER_SLOTS
         self.hero_list : dict[HeroEnum, Hero] = {}
-        hero_mage : Hero = Hero(HeroEnum.WIZARD, "Wizard", 
+        hero_mage : Hero = Hero(HeroEnum.WIZARD, "Ruphus", 
                                 {
                                     HeroStats.ANGER: 0,
-                                    HeroStats.BLOOD: 0,
-                                    HeroStats.FEAR: 0
+                                    HeroStats.BLOOD: 2,
+                                    HeroStats.FEAR: 4
                                 },
                                 {
                                     HeroStats.ANGER: 10,
                                     HeroStats.BLOOD: 10,
                                     HeroStats.FEAR: 10
                                 })
-        hero_rogue : Hero = Hero(HeroEnum.ROGUE, "Rogue", 
+        hero_rogue : Hero = Hero(HeroEnum.ROGUE, "Sylas", 
                                 {
-                                    HeroStats.ANGER: 0,
-                                    HeroStats.BLOOD: 0,
-                                    HeroStats.FEAR: 0
+                                    HeroStats.ANGER: 1,
+                                    HeroStats.BLOOD: 4,
+                                    HeroStats.FEAR: 1
                                 },
                                 {
                                     HeroStats.ANGER: 10,
                                     HeroStats.BLOOD: 10,
                                     HeroStats.FEAR: 10
                                 }) 
-        hero_warrior : Hero = Hero(HeroEnum.WARRIOR, "Warrior", 
+        hero_warrior : Hero = Hero(HeroEnum.WARRIOR, "Tharlic", 
                                 {
-                                    HeroStats.ANGER: 0,
-                                    HeroStats.BLOOD: 0,
+                                    HeroStats.ANGER: 4,
+                                    HeroStats.BLOOD: 2,
                                     HeroStats.FEAR: 0
                                 },
                                 {

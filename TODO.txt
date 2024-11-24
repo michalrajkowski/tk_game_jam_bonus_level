@@ -48,3 +48,9 @@ Lich Dungeon
 # more actions
 # player can die?
 # 
+
+
+--------------------
+hero dies on 0 hp?
+- show bars next to heroes?
+BLOOD, ANGER, FEAR
