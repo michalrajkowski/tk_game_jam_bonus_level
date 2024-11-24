@@ -36,3 +36,9 @@ Lich Dungeon
 
 ===============
 # Load players art
+
+# Turn order and game end?
+
+# more cards?
+
+# More options (depending on room content?)

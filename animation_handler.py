@@ -6,9 +6,14 @@ class AnimationHandler():
         self.not_blocking_anim_queue = []
         self.go_back_to_state_after_blocking = None
         self.game_manager = None
+        self.room_manager = None
+
+    def end_room_anim(self):
+        self.add_anim(EndTurnAnimation(1.0,0,0), True)
 
     def has_block_anims(self):
         return len(self.blocking_anim_queue) > 0
+    
     def do_one_frame(self):
         for anim in self.not_blocking_anim_queue:
             anim.do_one_frame()
@@ -37,6 +42,7 @@ class AnimationHandler():
 
     def add_anim(self, animation, blocking=False):
         animation.animation_manager = self
+        animation.room_manager = self.room_manager
         if blocking:
             self.blocking_anim_queue.append(animation)
         else:
@@ -62,6 +68,7 @@ class Animation():
         self.y = y
         self.anim_element = anim_element
         self.animation_manager = None
+        self.room_manager = None
         self.overtime = 0.0
     
     def skip_animation(self):
@@ -70,10 +77,14 @@ class Animation():
     def do_one_frame(self):
         self.current_time -= 1/30
         if self.current_time + self.overtime<= 0.0:
+            self.on_end()
             # usun siebie z listy
             self.animation_manager.remove_anim(self)
         
     def draw_animation(self):
+        pass
+
+    def on_end(self):
         pass
 
 class BoxAnimation(Animation):
@@ -84,6 +95,39 @@ class BoxAnimation(Animation):
 
     def draw_animation(self):
         pyxel.rectb(self.x, self.y, self.size, self.size, self.color)
+
+
+class EndTurnAnimation(Animation):
+    def __init__(self, max_time, x, y, size=5, color=1, anim_element=None):
+        super().__init__(max_time, x, y, anim_element)
+        self.size = size
+        self.color = color
+
+    def draw_animation(self):
+        # Fill screen with black rect
+        anim_percent = 1.0 - self.current_time/self.max_time
+        pyxel.rect(0,0, 300*anim_percent, 300, 0)
+    
+    def on_end(self):
+        self.room_manager.load_next_room_content()
+        anim = StartTurnAnimation(1.0, 0,0)
+        self.animation_manager.add_anim(anim, True)
+        # Add animation that will reveal screen?
+
+class StartTurnAnimation(Animation):
+    def __init__(self, max_time, x, y, size=5, color=1, anim_element=None):
+        super().__init__(max_time, x, y, anim_element)
+        self.size = size
+        self.color = color
+
+    def draw_animation(self):
+        # Fill screen with black rect
+        anim_percent = self.current_time/self.max_time
+        pyxel.rect(0,0, 300*anim_percent, 300, 0)
+    
+    def on_end(self):
+        pass
+        # Add animation that will reveal screen?
 
 class TalkAnimation(Animation):
     def __init__(self, max_time, x, y, object_w, text: str, anim_element=None):
@@ -127,7 +171,6 @@ class TalkAnimation(Animation):
         percent = (1.0 - (self.current_time)/(self.max_time))*100
         if (percent > 100):
             percent = 100
-        print(percent)
         talk_text = cut_percentage(self.text, percent)
         pyxel.text(
             self.x + self.object_w / 2 - self.talk_bubble_size / 2 + 2,
@@ -158,7 +201,6 @@ def split_text_into_lines(text, bubble_width):
     if current_line:
         result_lines.append(''.join(current_line))
 
-    print(result_lines)
     return result_lines
 
 def cut_percentage(text, percent):

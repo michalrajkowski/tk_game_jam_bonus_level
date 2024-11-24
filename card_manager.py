@@ -4,6 +4,9 @@
 # - card has description what they do?
 # - cards with targets or no targets?
 # - for now basic actions (maybe they upgrade?)
+
+# EACH TURN ADD CARD TO HAND
+
 import pyxel
 import random
 from decisions import HeroEnum, get_state
@@ -23,7 +26,7 @@ class CardManager():
         self.hovered_card_index : int = None
         self.selected_card : Card = None
         self.grabbed_card : Card = None
-
+        self.first_tick = False
         
         self.SCREEN_W = None
         self.SCREEN_H = None
@@ -39,15 +42,21 @@ class CardManager():
     
     def load_example_hand(self, number):
         for i in range(number):
-            if (random.random() > 0.5):
-                card : Card = NecroBoltCard()
-            else:
-                card : Card = NecroBoltCard()
+            self.add_new_card_to_hand(timer=0.0)
+        
+    def add_new_card_to_hand(self, timer=0.6):
+        # Get new card?
+        card : Card = NecroBoltCard()
 
-            card.game_manager = self.game_manager
-            card.card_manager = self
-            self.cards_in_hand.append(card)
-            self.card_show_timers.append(0.0)
+        # Add it to the collection
+
+        card.game_manager = self.game_manager
+        card.card_manager = self
+        self.cards_in_hand.append(card)
+        self.card_show_timers.append(timer)
+        pass
+
+
     # Draw cards in hand.
     # draws them from middle
     def draw_ghastly_selects(self):
@@ -194,6 +203,10 @@ class CardManager():
         
     
     def simulate(self):
+        if (self.first_tick):
+            self.first_tick = False
+            self.add_new_card_to_hand()
+
         self.hovered_card_index = None
         (mouse_x, mouse_y) = (pyxel.mouse_x, pyxel.mouse_y)
         # Find if any card is highlited?
@@ -234,7 +247,6 @@ class CardManager():
                 self.card_show_timers[i] = 0.0
         
         if self.grabbed_card != None:
-            print(mouse_y)
             if pyxel.btn(pyxel.MOUSE_BUTTON_LEFT) == False:
                 if mouse_y < self.SCREEN_H - CARD_H - GRABBED_PLAY_H:
                 #play card

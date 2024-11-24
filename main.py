@@ -49,14 +49,20 @@ class App:
         pyxel.mouse(True)
         pyxel.load("assets/assets.pyxres")
 
+        self.initialize_game()
+
+        pyxel.run(self.update, self.draw)
+    
+    def initialize_game(self):
+        print("INITIALIZE")
         self.load_hero_sprites()
         self.current_frame = 0.0
 
         self.game_state = State.HEROES_THINK
         self.decision_manager : DecisionManager = DecisionManager()
-        self.room_manager : RoomManager = RoomManager()
         self.card_manager : CardManager = CardManager(self)
         self.animation_handler : AnimationHandler = AnimationHandler()
+        self.room_manager : RoomManager = RoomManager(self.animation_handler, self)
         self.hero_manager : HeroManager = HeroManager(self.animation_handler, PLAYER_SLOTS=HERO_SLOTS)
 
 
@@ -74,24 +80,33 @@ class App:
         self.decision_manager.PLAYER_SLOTS = HERO_SLOTS    
         self.hero_manager.animation_handler = self.animation_handler
         self.decision_manager.room_manager = self.room_manager
+        # self.animation_handler.room_manager = self.room_manager
+        self.room_manager.animation_handler = self.animation_handler
 
         self.game_state = State.ANIMATIONS_RESOLVING
         self.animation_handler.go_back_to_state_after_blocking = State.HEROES_THINK
-
-        pyxel.run(self.update, self.draw)
-
+    
+    def end_game(self):
+        self.game_state = State.GAME_ENDED
+    
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
+
+        if self.game_state== State.GAME_ENDED:
+            return
         self.current_frame += 1.0
-        self.simulate_turn()
         self.animation_handler.do_one_frame()
-        # Simulate the turn?
-        # - 
+        self.simulate_turn() 
+        if pyxel.btnp(pyxel.KEY_R):
+            self.initialize_game()
 
     def draw(self):
         pyxel.cls(0)
         # Draw animations        # Draw hud
+        if self.game_state == State.GAME_ENDED:
+            self.draw_end_screen()
+            return
         self.draw_hud()
         # Draw players zone
         self.draw_players_zone()
@@ -109,6 +124,42 @@ class App:
         # Load Heroes on screen
 
         self.animation_handler.draw_animations()
+    def draw_big_text(self, x, y, text, color, scale=3):
+            # Draw small text at the bottom of the screen (hidden area)
+        pyxel.text(0, pyxel.height - 10, text, color)
+        
+        # Iterate over the text's pixel area
+        for i in range(len(text) * 6):  # 6 pixels wide per character
+            for j in range(8):  # Characters are 8 pixels tall
+                pixel_color = pyxel.pget(i, pyxel.height - 10 + j)  # Read pixel color
+                if pixel_color == color:
+                    # Draw a scaled version of the pixel
+                    pyxel.rect(x + i * scale, y + j * scale, scale, scale, color)
+
+    def draw_end_screen(self):
+        alive_heroes = self.hero_manager.alive_heroes_num()
+        text = ""
+        if alive_heroes == 0:
+            # TOTAL DEMISE
+            pyxel.images[2].load(0, 0, "assets/pixelized_images/ending_3.png")
+            pyxel.blt(300,300, 2, 0, 0, 300, 300, scale=3)  
+            text = "Total Demise"
+        elif alive_heroes == 3:
+            # Epic fail:
+            pyxel.images[2].load(0, 0, "assets/pixelized_images/ending_1.png")
+            pyxel.blt(300,300, 2, 0, 0, 300, 300, scale=3)
+            text = "Heroes Escaped"
+        else:
+            # Parial victory
+            pyxel.images[2].load(0, 0, "assets/pixelized_images/ending_2.png")
+            pyxel.blt(300,300, 2, 0, 0, 300, 300, scale=3)
+            text = "Partial Demise"
+
+        pyxel.rect(0, 0, 300, 30, 0)
+        self.draw_big_text(0,0,text, 7 ,5)
+        pyxel.rect(0, 290, 100, 100, 0)
+        pyxel.rect(0, 260, 300, 40, 0)
+        self.draw_big_text(0,260,"R to Restart", 7 ,5)
 
     def load_hero_sprites(self):
         # load images for each character
@@ -147,11 +198,9 @@ class App:
 
         # Draw heroes decisions (later icons might be used for this as well?)
         hero_manager = self.hero_manager
-        pyxel.text(HERO_SLOTS[0][0], HERO_SLOTS[0][1] - 5, hero_manager.hero_list[HeroEnum.WIZARD].decision.description_short, 7)
-        pyxel.text(HERO_SLOTS[1][0], HERO_SLOTS[1][1] - 5, hero_manager.hero_list[HeroEnum.ROGUE].decision.description_short, 7)
-        pyxel.text(HERO_SLOTS[2][0], HERO_SLOTS[2][1] - 5, hero_manager.hero_list[HeroEnum.WARRIOR].decision.description_short, 7)
-        decision_decscription = hero_manager.hero_list[HeroEnum.WIZARD].decision.description_short
-        pyxel.text(0, 0, decision_decscription, 7)
+        pyxel.text(HERO_SLOTS[0][0], HERO_SLOTS[0][1] - 5, "Plan:" + hero_manager.hero_list[HeroEnum.WIZARD].decision.description_short, 13)
+        pyxel.text(HERO_SLOTS[1][0], HERO_SLOTS[1][1] - 5, "Plan:" + hero_manager.hero_list[HeroEnum.ROGUE].decision.description_short, 13)
+        pyxel.text(HERO_SLOTS[2][0], HERO_SLOTS[2][1] - 5, "Plan:" + hero_manager.hero_list[HeroEnum.WARRIOR].decision.description_short, 13)
 
     def draw_hud(self):
         # DRAW HUD BOX
@@ -161,11 +210,11 @@ class App:
     # Draw players zone
         # draw objects zone
     def draw_players_zone(self):
-        pyxel.rectb(0,HUD_ZONE_H,SCREEN_W, OBJECT_ZONE_H, 2)
+        # pyxel.rectb(0,HUD_ZONE_H,SCREEN_W, OBJECT_ZONE_H, 2)
         self.draw_heroes()
 
     def draw_objects_zone(self):
-        pyxel.rectb(0,HUD_ZONE_H+OBJECT_ZONE_H,SCREEN_W, PLAYERS_ZONE_H, 3)
+        # pyxel.rectb(0,HUD_ZONE_H+OBJECT_ZONE_H,SCREEN_W, PLAYERS_ZONE_H, 3)
         self.draw_objects()
 
     def draw_objects(self):
@@ -210,6 +259,9 @@ class App:
         if (self.game_state == State.HEROES_THINK):
             self.decision_manager.make_decisions()
             self.game_state = State.PLAYERS_ACT
+            self.animation_handler.go_back_to_state_after_blocking = self.game_state
+            self.game_state = State.ANIMATIONS_RESOLVING
+            self.card_manager.first_tick = True
             return
 
         if (self.game_state == State.PLAYERS_ACT):

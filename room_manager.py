@@ -5,21 +5,35 @@
 import random
 
 class RoomManager():
-    def __init__(self):
+    def __init__(self, animation_handler, game_manager):
+        self.animation_handler = animation_handler
+        self.animation_handler.room_manager = self
+        self.game_manager = game_manager
         self.too_late = False
         self.current_room_index = -1
         self.current_room : Room = None
-        self.max_rooms = 6
+        self.max_rooms = 1
         self.rooms_list : list[Room] = []
         self.current_turn = 0
         self.initialize_rooms()
         self.go_to_next_room()
 
     def go_to_next_room(self):
+        if self.too_late:
+            return
         self.too_late = True
-        self.current_room_index += 1
-        self.current_room = self.rooms_list[self.current_room_index]
+        self.animation_handler.end_room_anim()
+        # Add anim that will load next room content 
+        
+
+    def load_next_room_content(self):
         self.current_turn = 0
+        self.current_room_index += 1
+        if self.current_room_index >= self.max_rooms:
+            self.current_room_index = 0
+            self.game_manager.end_game()
+            return
+        self.current_room = self.rooms_list[self.current_room_index]
 
     def initialize_rooms(self):
         for i in range(self.max_rooms):

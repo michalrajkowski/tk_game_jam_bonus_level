@@ -60,6 +60,12 @@ class HeroManager():
     def resolve_decisions(self):
         for hero in self.hero_list.values():
             hero.resolve_decisions(self)
+    def alive_heroes_num(self):
+        alive = 3
+        for hero in self.hero_list.values(): 
+            if hero.is_dead:
+                alive -=1
+        return alive
 class Hero():
     def __init__(self, hero_type : HeroEnum,name : str, current_stats : dict[HeroStats, int], max_stats : dict[HeroStats, int]):
         self.animation_handler : AnimationHandler = None
@@ -70,6 +76,7 @@ class Hero():
         self.decision : Decision = None
         self.set_decision(NoneDecision())
         self.PLAYER_SLOTS = None
+        self.is_dead = False
         
 
     def __str__(self):
@@ -129,6 +136,7 @@ class Hero():
             TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
             True
         )
+
     def play_anim(self, animation, blocking=False):
         self.animation_handler.add_anim(
             animation,

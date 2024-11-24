@@ -8,3 +8,4 @@ class State(Enum):
     POST_PLAYED_ANIMS = auto()
     ANIMATIONS_RESOLVING = auto()
     RESOLVING_HERO_ACTIONS = auto()
+    GAME_ENDED = auto()

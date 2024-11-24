@@ -1,6 +1,7 @@
 # Decision of what he wants to do
 from enum import Enum, auto
 import random
+from animation_handler import TalkAnimation
 
 class HeroEnum(Enum):
     WIZARD = 0
@@ -25,7 +26,10 @@ class Decision():
         self.initialize_weigth()
 
     def resolve(self, hero, hero_manager):
-        print("RESOLVED")
+        # Gighlight this hero action?
+        if (self.room_manager.too_late == True):
+            return
+        hero.say("TIME FOR MY TURN!!!")
 
     # Change it's weigth based on some conditions???
     def initialize_weigth(self):
@@ -49,16 +53,23 @@ class Rest_Decision(Decision):
             HeroEnum.DEFAULT: ["Maybe i could rest a bit..."]
         }
 
+    def resolve(self, hero, hero_manager):
+        return super().resolve(hero, hero_manager)
+        if (self.room_manager.too_late == True):
+            return
+        # Regenerate some resource?
+
 class GoNextRoom_Decision(Decision):
     def __init__(self):
         from hero_manager import HeroEnum
         super().__init__()
-        self.description_short = "Go to the next room"
+        self.description_short = "Escape"
         self.description_box = {
             HeroEnum.DEFAULT: ["I think we should keep going."]
         }
     
-    def resolve(self, hero, hero_manager):
+    def resolve(self, this_hero, hero_manager):
+        super().resolve(this_hero, hero_manager)
         if (self.room_manager.too_late == True):
             return
         # If at least 2 other players want to go to the next room, go to the next room,
@@ -66,8 +77,8 @@ class GoNextRoom_Decision(Decision):
         
         # If not the asker gets angry
         votes_yes = 0
-        for hero in hero_manager.hero_list.values():
-            if (isinstance(hero.decision, GoNextRoom_Decision)):
+        for new_hero in hero_manager.hero_list.values():
+            if (isinstance(new_hero.decision, GoNextRoom_Decision)):
                 votes_yes+=1
         if votes_yes == 1:
             # Asker gets angry / fear
@@ -77,8 +88,8 @@ class GoNextRoom_Decision(Decision):
                 "Can we leave this place please?!"
             ]
             to_say = random.choice(texts)
-            hero.say(to_say)
-            hero.get_anger(1)
+            this_hero.say(to_say)
+            this_hero.get_anger(1)
         else:
             texts = [
                 "We voted to leave!",
@@ -86,7 +97,7 @@ class GoNextRoom_Decision(Decision):
                 "We are leaving."
             ]
             to_say = random.choice(texts)
-            hero.say(to_say)
+            this_hero.say(to_say)
             for hero_2 in hero_manager.hero_list.values():
                 if not (isinstance(hero_2.decision, GoNextRoom_Decision)):
                     # This one is about to get angry
