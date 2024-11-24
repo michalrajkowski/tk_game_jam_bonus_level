@@ -87,22 +87,30 @@ class App:
         self.room_manager.animation_handler = self.animation_handler
 
         self.game_state = State.ANIMATIONS_RESOLVING
-        self.animation_handler.go_back_to_state_after_blocking = State.HEROES_THINK
+        self.animation_handler.go_back_to_state_after_blocking = State.START_GAME
     
     def end_game(self):
         self.force_game_end = True
         self.game_state = State.GAME_ENDED
     
     def update(self):
+        if pyxel.btnp(pyxel.KEY_SPACE) and self.game_state== State.START_GAME:
+            self.game_state = State.HEROES_THINK 
+            self.load_hero_sprites()
+            self.load_objects_sprites()
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
-        
+        if pyxel.btnp(pyxel.KEY_T):
+            self.room_manager.go_to_next_room()
         if pyxel.btnp(pyxel.KEY_R):
             self.initialize_game()
         if self.force_game_end == True:
             self.game_state = State.GAME_ENDED
 
         if self.game_state== State.GAME_ENDED:
+            return
+        
+        if self.game_state== State.START_GAME:
             return
         self.current_frame += 1.0
         self.animation_handler.do_one_frame()
@@ -111,6 +119,9 @@ class App:
     def draw(self):
         pyxel.cls(0)
         # Draw animations        # Draw hud
+        if self.game_state == State.START_GAME:
+            self.draw_start_game()
+            return
         if self.game_state == State.GAME_ENDED:
             self.draw_end_screen()
             return
@@ -132,6 +143,18 @@ class App:
         # Load Heroes on screen
 
         self.animation_handler.draw_animations()
+
+    def draw_start_game(self):
+        # Draw start game image
+        pyxel.images[2].load(0, 0, "assets/pixelized_images/lich_art.png")
+        pyxel.blt(75,75, 2, 0, 0, 150, 150, scale=2)  
+        pyxel.rect(0, 0, 300, 30, 0)
+        self.draw_big_text(0,0,"Lich Dungeon", 7 ,5)
+        pyxel.rect(0, 290, 100, 100, 0)
+        pyxel.rect(0, 260, 300, 40, 0)
+        self.draw_big_text(0,260,"[SPACE] to start", 7 ,5)
+
+
     def draw_big_text(self, x, y, text, color, scale=3):
             # Draw small text at the bottom of the screen (hidden area)
         pyxel.text(0, pyxel.height - 10, text, color)

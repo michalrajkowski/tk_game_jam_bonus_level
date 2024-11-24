@@ -9,6 +9,7 @@ class State(Enum):
     ANIMATIONS_RESOLVING = auto()
     RESOLVING_HERO_ACTIONS = auto()
     GAME_ENDED = auto()
+    START_GAME = auto()
 
 from enum import Enum, auto
 class ObjectEnum(Enum):

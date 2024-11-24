@@ -29,6 +29,7 @@ class RoomManager():
         
 
     def load_next_room_content(self):
+        self.too_late = False
         self.current_turn = 0
         self.current_room_index += 1
         if self.current_room_index >= self.max_rooms:
