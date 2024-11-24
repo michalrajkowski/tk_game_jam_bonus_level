@@ -46,7 +46,9 @@ class CardManager():
         
     def add_new_card_to_hand(self, timer=0.6):
         # Get new card?
-        card : Card = NecroBoltCard()
+        basic_cards = [NecroBoltCard(), InstillFear(), Annoy()]
+        chosen_card = random.choice(basic_cards)
+        card : Card = chosen_card
 
         # Add it to the collection
 
@@ -323,6 +325,36 @@ class NecroBoltCard(Card):
         # Hero takes 1 wound
         # He speaks sth?
         self.card_target_player.get_wound()
+        self.card_manager.selected_card = None
+
+class InstillFear(Card):
+    def __init__(self):
+        super().__init__()
+        self.name = "Instill Fear"
+        self.description = "Increase Hero's Fear by 1"
+        self.choose_targets = True
+        self.can_target_players = True
+        self.description = split_text_into_lines(self.description, CARD_W-4)
+    
+    def resolve_card(self):
+        # Hero takes 1 wound
+        # He speaks sth?
+        self.card_target_player.get_fear()
+        self.card_manager.selected_card = None
+
+class Annoy(Card):
+    def __init__(self):
+        super().__init__()
+        self.name = "Annoyance"
+        self.description = "Increase Hero's Anger by 1"
+        self.choose_targets = True
+        self.can_target_players = True
+        self.description = split_text_into_lines(self.description, CARD_W-4)
+    
+    def resolve_card(self):
+        # Hero takes 1 wound
+        # He speaks sth?
+        self.card_target_player.get_anger()
         self.card_manager.selected_card = None
         
 class SkipCard(Card):

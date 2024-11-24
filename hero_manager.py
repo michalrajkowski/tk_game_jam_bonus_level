@@ -124,7 +124,8 @@ class Hero():
             True
         )
         self.animation_handler.add_anim(
-            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Blood", 8)
+            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Blood", 8),
+            True
         )
 
     def say(self, str):
@@ -171,7 +172,8 @@ class Hero():
             True
         )
         self.animation_handler.add_anim(
-            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Anger", 9)
+            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Anger", 9),
+            True
         )
 
 
@@ -202,7 +204,8 @@ class Hero():
             True
         )
         self.animation_handler.add_anim(
-            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Fear", 2)
+            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Fear", 2),
+            True
         )
 
             
