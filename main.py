@@ -12,6 +12,7 @@ from hero_manager import HeroManager
 from room_manager import RoomManager, Room
 from card_manager import CardManager
 from game_manager import State
+from animation_handler import AnimationHandler
 
 # CONSTANTS:
 # Box - x, y, w, h
@@ -58,6 +59,8 @@ class App:
         self.card_manager.PLAYER_SLOTS = HERO_SLOTS
         self.card_manager.OBJECT_SIZE = OBJECT_SIZE
         self.card_manager.HERO_SIZE = HERO_SIZE
+        self.card_manager.hero_manager = self.hero_manager
+        self.card_manager.room_manager = self.room_manager
 
         pyxel.run(self.update, self.draw)
 
@@ -161,8 +164,12 @@ class App:
             # Choose target for our card
             # Draw choice target arrow
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-                if self.card_manager.is_valid_target():
-                    pass
+                valid_target, index = self.card_manager.is_valid_target()
+                if valid_target:
+                    # Set target for card
+                    # move to play phase
+                    self.card_manager.select_card_target(index)
+                    self.game_state = State.CARD_PLAYED
                 else:
                 # If mouse released on non valid target:
                 # - unselect card
@@ -174,7 +181,10 @@ class App:
             return
         
         if (self.game_state == State.CARD_PLAYED):
-            print("CARD PLAYED")
+            # resolve card effect
+            # Wait for animations et
+            self.card_manager.resolve_card()
+            self.game_state = State.POST_PLAYED_ANIMS
             return
         # Heroes decide what to do
 

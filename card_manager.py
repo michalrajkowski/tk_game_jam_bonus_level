@@ -6,6 +6,7 @@
 # - for now basic actions (maybe they upgrade?)
 import pyxel
 import random
+from decisions import HeroEnum, get_state
 from game_manager import State
 LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget ex ac purus scelerisque suscipit ac ut turpis. Quisque ut massa posuere, ultrices nunc quis, sagittis tortor. Cras ac leo enim. Pellentesque ut viverra augue, et maximus orci. Ut non mollis elit. Donec sed feugiat ligula, ut rhoncus turpis. Nulla elementum a dui accumsan vulputate. Praesent sem lacus, dignissim id eros vitae, ultricies volutpat quam. Etiam non vehicula ex. "
 (CARD_W, CARD_H) = (60, 90)
@@ -22,6 +23,7 @@ class CardManager():
         self.hovered_card_index : int = None
         self.selected_card : Card = None
         self.grabbed_card : Card = None
+
         
         self.SCREEN_W = None
         self.SCREEN_H = None
@@ -31,7 +33,8 @@ class CardManager():
         self.HERO_SIZE = None
 
         self.game_manager = game_manager
-
+        self.hero_manager = None
+        self.room_manager = None
         self.load_example_hand(3)
     
     def load_example_hand(self, number):
@@ -62,7 +65,20 @@ class CardManager():
                 # Draw highlight around player:
                 slot = self.OBJECT_SLOTS[i]
                 pyxel.rectb(slot[0] - animation_state, slot[1]- animation_state, self.OBJECT_SIZE[0]+animation_state*2, self.OBJECT_SIZE[1]+animation_state*2, 7)
-            
+    def resolve_card(self):
+        # Resolve card effect:
+        self.selected_card.resolve_card()
+    
+    def select_card_target(self, index):
+        if self.selected_card.can_target_players:
+            self.selected_card.card_target_player = self.hero_manager.hero_list[get_state(index)]
+            print("Assigned target")
+            print(self.selected_card.card_target_player)
+        if self.selected_card.can_target_objects:
+            self.selected_card.card_target_object = self.room_manager.current_room.room_elements[index]
+            print("Assigned target")
+            print(self.selected_card.card_target_object)
+
     def is_mouse_in_space(self, x,y,space):
         if space[0]<= x <= space[0]+space[2] and space[1] <= y <= space[1] + space[3]:
             return True
@@ -73,7 +89,7 @@ class CardManager():
             for i in range(len(self.PLAYER_SLOTS)):
                 # Draw highlight around player:
                 if (self.is_mouse_in_space(pyxel.mouse_x, pyxel.mouse_y, self.PLAYER_SLOTS[i])):
-                    return True
+                    return True, i
                 
         if self.selected_card.can_target_objects:
             # Daw indicator around each object
@@ -81,7 +97,7 @@ class CardManager():
             for i in range(len(self.OBJECT_SLOTS)):
                 # Draw highlight around player:
                 if (self.is_mouse_in_space(pyxel.mouse_x, pyxel.mouse_y, self.OBJECT_SLOTS[i])):
-                    return True
+                    return True, i
         return False
     def unselect_card(self, card):
         place_index = 0
@@ -263,12 +279,17 @@ class Card():
         self.choose_targets = False
         self.can_target_players = False
         self.can_target_objects = False
+        self.card_target_object = None
+        self.card_target_player = None
 
     def play_card(self):
         if self.choose_targets == True:
             self.game_manager.game_state =State.CARD_CHOOSING_TARGETS
         else:
             self.game_manager.game_state = State.CARD_PLAYED
+    def resolve_card(self):
+        print("Card Resolving:")
+        print(self)
 
 class DefaultCard(Card):
     def __init__(self):

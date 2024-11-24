@@ -5,4 +5,5 @@ class State(Enum):
     PLAYERS_ACT = auto()
     CARD_PLAYED = auto()
     CARD_CHOOSING_TARGETS = auto()
+    POST_PLAYED_ANIMS = auto()
     ANIMATIONS_RESOLVING = auto()

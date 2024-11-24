@@ -31,7 +31,7 @@ class Room():
     def __init__(self, room_name : str = "room name", room_icon = (0,0,16,16)):
         self.room_name : str = room_name
         self.room_icon = room_icon
-        self.room_elements : list[RoomElement] = []
+        self.room_elements : dict[int, RoomElement] = {0: None, 1: None, 2: None}
         pass
 
 class MysteryRoom(Room):

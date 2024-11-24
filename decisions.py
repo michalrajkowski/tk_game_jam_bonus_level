@@ -2,10 +2,16 @@
 from enum import Enum, auto
 
 class HeroEnum(Enum):
-    WIZARD = auto()
-    ROGUE = auto()
-    WARRIOR = auto()
-    DEFAULT = auto()
+    WIZARD = 0
+    ROGUE = 1
+    WARRIOR = 2
+    DEFAULT = 3
+
+def get_state(index):
+    try:
+        return HeroEnum(index)
+    except ValueError:
+        return None  # Return None or handle invalid index
 
 class Decision():
     def __init__(self, weigth=5):
