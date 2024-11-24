@@ -17,6 +17,11 @@ from animation_handler import AnimationHandler, BoxAnimation
 # CONSTANTS:
 # Box - x, y, w, h
 
+WIZARD_IMAGES = []
+WARIOR_IMAGE = []
+ROGUE_IMAGES = []
+DUNGEON_BACKGROUND = []
+
 HUD_ZONE_H = 50
 OBJECT_ZONE_H = 80 
 PLAYERS_ZONE_H = 100
@@ -44,6 +49,7 @@ class App:
         pyxel.mouse(True)
         pyxel.load("assets/assets.pyxres")
 
+        self.load_hero_sprites()
         self.current_frame = 0.0
 
         self.game_state = State.HEROES_THINK
@@ -104,13 +110,40 @@ class App:
 
         self.animation_handler.draw_animations()
 
+    def load_hero_sprites(self):
+        # load images for each character
+        pyxel.images[2].load(0, 0, "assets/pixelized_images/wizard_01.png")
+        WIZARD_IMAGES.append((0,0,HERO_SIZE[0], HERO_SIZE[1]))
+
+        pyxel.images[2].load(0, 80, "assets/pixelized_images/rogue_01.png")
+        ROGUE_IMAGES.append((0,80,HERO_SIZE[0], HERO_SIZE[1]))
+
+        pyxel.images[2].load(0, 160, "assets/pixelized_images/warrior_01.png")
+        WARIOR_IMAGE.append((0,160,HERO_SIZE[0], HERO_SIZE[1]))
+
+        pyxel.images[1].load(0, 0, "assets/pixelized_images/dng_wall.png")
+        DUNGEON_BACKGROUND.append((0,0,150,20))
 
     def draw_heroes(self):
-                
         # Draw individual heroes inside it
-        pyxel.rect(HERO_SLOTS[0][0], HERO_SLOTS[0][1], HERO_SIZE[0], HERO_SIZE[1], 5)
-        pyxel.rect(HERO_SLOTS[1][0], HERO_SLOTS[1][1], HERO_SIZE[0], HERO_SIZE[1], 3)
-        pyxel.rect(HERO_SLOTS[2][0], HERO_SLOTS[2][1], HERO_SIZE[0], HERO_SIZE[1], 8)
+        #pyxel.rect(HERO_SLOTS[0][0], HERO_SLOTS[0][1], HERO_SIZE[0], HERO_SIZE[1], 5)
+
+        # LOAD DUNGEON BACKGROUND
+        dungeon_background = DUNGEON_BACKGROUND[0]
+        pyxel.blt(75, HUD_ZONE_H+OBJECT_ZONE_H+PLAYERS_ZONE_H+10
+                  , 1, dungeon_background[0],dungeon_background[1],dungeon_background[2],dungeon_background[3], 0, scale=2.0)
+
+        # Simple resize anim?
+        wizard_sprite = WIZARD_IMAGES[0]
+        pyxel.blt(HERO_SLOTS[0][0], HERO_SLOTS[0][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+        # pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 0, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3])
+
+        wizard_sprite = ROGUE_IMAGES[0]
+        pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+
+        wizard_sprite = WARIOR_IMAGE[0]
+        pyxel.blt(HERO_SLOTS[2][0], HERO_SLOTS[2][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+
 
         # Draw heroes decisions (later icons might be used for this as well?)
         hero_manager = self.hero_manager

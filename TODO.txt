@@ -33,3 +33,6 @@ Lich Dungeon
 - turn move anim
 - ending screen
 - WINING / LOSING condition?
+
+===============
+# Load players art
