@@ -101,7 +101,7 @@ class StatIncreaseAnimation(Animation):
         super().__init__(max_time, x, y, anim_element)
         self.text = text
         self.color = color
-
+    
     def draw_animation(self):
        max_offset_y = 15
        offset_y = (1.0 - (self.current_time/self.max_time))* max_offset_y

@@ -9,14 +9,15 @@ import pyxel
 from enum import Enum, auto
 from decision_manager import DecisionManager, HeroEnum
 from hero_manager import HeroManager, HeroStats
-from room_manager import RoomManager, Room
+from room_manager import RoomManager, Room, RoomElement
 from card_manager import CardManager
-from game_manager import State
+from game_manager import State, ObjectEnum
 from animation_handler import AnimationHandler, BoxAnimation
+
 
 # CONSTANTS:
 # Box - x, y, w, h
-
+ROOM_ELEMENTS_ARTS = {}
 WIZARD_IMAGES = []
 WARIOR_IMAGE = []
 ROGUE_IMAGES = []
@@ -57,6 +58,7 @@ class App:
     def initialize_game(self):
         print("INITIALIZE")
         self.load_hero_sprites()
+        self.load_objects_sprites()
         self.current_frame = 0.0
         self.force_game_end = False
         self.game_state = State.HEROES_THINK
@@ -182,7 +184,12 @@ class App:
 
         pyxel.images[2].load(40, 0, "assets/pixelized_images/dead_player.png")
         DEAD_PLAYER.append((40,0,40, 60))
+    def load_objects_sprites(self):
+        pyxel.images[1].load(0, 180, "assets/pixelized_images/library.png")
+        ROOM_ELEMENTS_ARTS[ObjectEnum.FURNITURE_1] = (0,180,60,60)
 
+        pyxel.images[1].load(60, 180, "assets/pixelized_images/drake.png")
+        ROOM_ELEMENTS_ARTS[ObjectEnum.MONSTER_1] = (60,180,60,60)
 
     def draw_heroes(self):
         # Draw individual heroes inside it
@@ -265,9 +272,14 @@ class App:
 
     def draw_objects(self):
         # Draw individual heroes inside it
-        pyxel.rect(OBJECT_SLOTS[0][0], OBJECT_SLOTS[0][1], OBJECT_SIZE[0], OBJECT_SIZE[1], 5)
-        pyxel.rect(OBJECT_SLOTS[1][0], OBJECT_SLOTS[1][1], OBJECT_SIZE[0], OBJECT_SIZE[1], 3)
-        pyxel.rect(OBJECT_SLOTS[2][0], OBJECT_SLOTS[2][1], OBJECT_SIZE[0], OBJECT_SIZE[1], 8)
+        for i in range(3):
+            room_element : RoomElement = self.room_manager.rooms_list[self.room_manager.current_room_index].room_elements[i]
+            if room_element == None:
+                continue
+            # Draw proper room element texture?
+            (u,v,w,h) = ROOM_ELEMENTS_ARTS[room_element.enum]
+            pyxel.blt(OBJECT_SLOTS[i][0], OBJECT_SLOTS[i][1],1,u,v,w,h,0)
+            #pyxel.rect(OBJECT_SLOTS[i][0], OBJECT_SLOTS[i][1], OBJECT_SIZE[0], OBJECT_SIZE[1], 5)
 
     def draw_rooms_left(self):
         # Draw on top?

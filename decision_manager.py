@@ -3,6 +3,8 @@ from decisions import Decision, Rest_Decision, GoNextRoom_Decision, HeroEnum
 from animation_handler import AnimationHandler, TalkAnimation
 from room_manager import RoomManager
 import random
+from game_manager import ObjectEnum
+
 
 class DecisionManager():
     def __init__(self, game_manager):
@@ -59,5 +61,7 @@ class DecisionManager():
             go_next_room,
         ]
         return default_decisions
-    def get_room_traits():
+    def get_room_decisions(self):
+        # self.room = 
+        []
         pass

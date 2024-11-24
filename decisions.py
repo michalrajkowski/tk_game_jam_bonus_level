@@ -29,7 +29,6 @@ class Decision():
         # Gighlight this hero action?
         if (self.room_manager.too_late == True):
             return
-        hero.say("TIME FOR MY TURN!!!")
 
     # Change it's weigth based on some conditions???
     def initialize_weigth(self):
