@@ -6,6 +6,7 @@ import random
 
 class RoomManager():
     def __init__(self):
+        self.too_late = False
         self.current_room_index = -1
         self.current_room : Room = None
         self.max_rooms = 6
@@ -15,6 +16,7 @@ class RoomManager():
         self.go_to_next_room()
 
     def go_to_next_room(self):
+        self.too_late = True
         self.current_room_index += 1
         self.current_room = self.rooms_list[self.current_room_index]
         self.current_turn = 0

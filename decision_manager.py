@@ -11,8 +11,10 @@ class DecisionManager():
         self.room_manager : RoomManager = None
         self.PLAYER_SLOTS = None
         pass
+
     def make_decisions(self):
         # Get decision for each player?
+        self.room_manager.too_late = False
         
         # For each hero:
         # MAKE DECISION:
@@ -34,6 +36,7 @@ class DecisionManager():
         
         # Select one decision randomly, considering the weights
         selected_decision = random.choices(decisions, weights=weights, k=1)[0]
+        selected_decision.room_manager = self.room_manager
         hero.set_decision(selected_decision)
         hero_pos = self.PLAYER_SLOTS[hero.hero_type.value]
         # Get random description:

@@ -90,15 +90,102 @@ class Hero():
     def set_decision(self, decision : Decision):
         self.decision = decision
 
-    def get_wound(self):
+    def get_wound(self, value=1):
+        """
+        Increases the BLOOD stat and triggers an animation with a message.
+        """
         print("GET WOUND")
         print(self)
-        self.current_stats[HeroStats.BLOOD] += 1
+        
+        # Update blood stat
+        self.current_stats[HeroStats.BLOOD] += value
+        
+        # Description texts for blood wounds
         description_box = {
             HeroEnum.DEFAULT: ["Ouch! What was that?", "Oof, who hurt me??", "Argh! What the...."]
         }
-        print(self.PLAYER_SLOTS)
-        hero_pos = self.PLAYER_SLOTS[self.hero_type.value]
-        descritpion = random.choice(description_box[HeroEnum.DEFAULT])
-        self.animation_handler.add_anim(TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], descritpion), True)
         
+        # Get hero position
+        hero_pos = self.PLAYER_SLOTS[self.hero_type.value]
+        
+        # Select description
+        description = random.choice(description_box[HeroEnum.DEFAULT])
+        
+        # Add animation
+        self.animation_handler.add_anim(
+            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+            True
+        )
+
+    def say(self, str):
+        # Get hero position
+        hero_pos = self.PLAYER_SLOTS[self.hero_type.value]
+        
+        # Select description
+        description = str
+        
+        # Add animation
+        self.animation_handler.add_anim(
+            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+            True
+        )
+    def play_anim(self, animation, blocking=False):
+        self.animation_handler.add_anim(
+            animation,
+            blocking)
+    def get_anger(self, value=1):
+        """
+        Increases the ANGER stat and triggers an animation with a message.
+        """
+        print("GET ANGER")
+        print(self)
+        
+        # Update anger stat
+        self.current_stats[HeroStats.ANGER] += value
+        
+        # Description texts for anger
+        description_box = {
+            HeroEnum.DEFAULT: ["I'm so mad right now!", "This makes my blood boil!", "I'll get you for this!"]
+        }
+        
+        # Get hero position
+        hero_pos = self.PLAYER_SLOTS[self.hero_type.value]
+        
+        # Select description
+        description = random.choice(description_box[HeroEnum.DEFAULT])
+        
+        # Add animation
+        self.animation_handler.add_anim(
+            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+            True
+        )
+
+
+    def get_fear(self, value=1):
+        """
+        Increases the FEAR stat and triggers an animation with a message.
+        """
+        print("GET FEAR")
+        print(self)
+        
+        # Update fear stat
+        self.current_stats[HeroStats.FEAR] += value
+        
+        # Description texts for fear
+        description_box = {
+            HeroEnum.DEFAULT: ["What was that? I'm scared!", "No, no, no! This isn't right!", "I can't handle this!"]
+        }
+        
+        # Get hero position
+        hero_pos = self.PLAYER_SLOTS[self.hero_type.value]
+        
+        # Select description
+        description = random.choice(description_box[HeroEnum.DEFAULT])
+        
+        # Add animation
+        self.animation_handler.add_anim(
+            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+            True
+        )
+
+            

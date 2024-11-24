@@ -26,3 +26,10 @@ Lich Dungeon
 - each is skipable with click / skip option
 - each frame it is pinged to simulate animation frame
 - if there are no animations, return priority?
+
+#### GRAND TODO
+- graphics
+- new card draw + simple anim?
+- turn move anim
+- ending screen
+- WINING / LOSING condition?
