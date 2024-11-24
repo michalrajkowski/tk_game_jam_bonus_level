@@ -22,6 +22,9 @@ class Decision():
         self.description_box : dict[HeroEnum, list[str]] = {}
         self.initialize_weigth()
 
+    def resolve(self, hero, hero_manager):
+        print("RESOLVED")
+
     # Change it's weigth based on some conditions???
     def initialize_weigth(self):
         pass
@@ -52,3 +55,6 @@ class GoNextRoom_Decision(Decision):
         self.description_box = {
             HeroEnum.DEFAULT: ["I think we should keep going."]
         }
+    
+    def resolve(self, hero, hero_manager):
+        print("GO NEXT MAN!!")

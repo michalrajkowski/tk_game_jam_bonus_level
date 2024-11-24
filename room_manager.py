@@ -10,12 +10,14 @@ class RoomManager():
         self.current_room : Room = None
         self.max_rooms = 6
         self.rooms_list : list[Room] = []
+        self.current_turn = 0
         self.initialize_rooms()
         self.go_to_next_room()
 
     def go_to_next_room(self):
         self.current_room_index += 1
         self.current_room = self.rooms_list[self.current_room_index]
+        self.current_turn = 0
 
     def initialize_rooms(self):
         for i in range(self.max_rooms):

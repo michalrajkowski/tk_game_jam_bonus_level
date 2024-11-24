@@ -40,9 +40,9 @@ class CardManager():
     def load_example_hand(self, number):
         for i in range(number):
             if (random.random() > 0.5):
-                card : Card = DefaultCard()
+                card : Card = NecroBoltCard()
             else:
-                card : Card = SkipCard()
+                card : Card = NecroBoltCard()
 
             card.game_manager = self.game_manager
             card.card_manager = self
@@ -297,11 +297,34 @@ class DefaultCard(Card):
         self.name = "Default Card"
         self.choose_targets = True
         self.can_target_players = True
+
+class NecroBoltCard(Card):
+    def __init__(self):
+        super().__init__()
+        self.name = "Necro Bolt"
+        self.description = "Deal 1 Wound to a Hero."
+        self.choose_targets = True
+        self.can_target_players = True
+        self.description = split_text_into_lines(self.description, CARD_W-4)
+    
+    def resolve_card(self):
+        # Hero takes 1 wound
+        # He speaks sth?
+        self.card_target_player.get_wound()
+        self.card_manager.selected_card = None
         
 class SkipCard(Card):
     def __init__(self):
         super().__init__()
         self.name = "Skip Turn"
+        self.description = "Skip your turn"
+        self.description = split_text_into_lines(self.description, CARD_W-4)
+
+    def resolve_card(self):
+        pass
+        # Hero takes 1 wound
+        # He speaks sth?
+
 
 def split_text_into_lines(text, card_w):
     current_line = []

@@ -48,10 +48,11 @@ class App:
 
         self.game_state = State.HEROES_THINK
         self.decision_manager : DecisionManager = DecisionManager()
-        self.hero_manager : HeroManager = HeroManager()
         self.room_manager : RoomManager = RoomManager()
         self.card_manager : CardManager = CardManager(self)
         self.animation_handler : AnimationHandler = AnimationHandler()
+        self.hero_manager : HeroManager = HeroManager(self.animation_handler, PLAYER_SLOTS=HERO_SLOTS)
+
 
         self.decision_manager.hero_manager = self.hero_manager
         self.card_manager.SCREEN_W = SCREEN_W
@@ -63,13 +64,13 @@ class App:
         self.card_manager.hero_manager = self.hero_manager
         self.card_manager.room_manager = self.room_manager
         self.animation_handler.game_manager = self
-        
+        self.decision_manager.animation_handler = self.animation_handler
+        self.decision_manager.PLAYER_SLOTS = HERO_SLOTS    
+        self.hero_manager.animation_handler = self.animation_handler
+        self.decision_manager.room_manager = self.room_manager
+
         self.game_state = State.ANIMATIONS_RESOLVING
         self.animation_handler.go_back_to_state_after_blocking = State.HEROES_THINK
-        self.animation_handler.add_anim(BoxAnimation(5.0, 10, 10, 40, 2), True)
-        self.animation_handler.add_anim(BoxAnimation(5.0, 40, 10, 40, 3), True)
-        self.animation_handler.add_anim(BoxAnimation(5.0, 60, 10, 40, 4), True)
-
 
         pyxel.run(self.update, self.draw)
 
@@ -84,9 +85,7 @@ class App:
 
     def draw(self):
         pyxel.cls(0)
-        # Draw animations
-        self.animation_handler.draw_animations()
-        # Draw hud
+        # Draw animations        # Draw hud
         self.draw_hud()
         # Draw players zone
         self.draw_players_zone()
@@ -102,6 +101,9 @@ class App:
         else:
             self.card_manager.draw_cards(shrinked=True)
         # Load Heroes on screen
+
+        self.animation_handler.draw_animations()
+
 
     def draw_heroes(self):
                 
@@ -166,6 +168,12 @@ class App:
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) or pyxel.btnp(pyxel.KEY_SPACE):
                 self.animation_handler.skip_current()
 
+
+        if (self.animation_handler.has_block_anims() and self.game_state != State.ANIMATIONS_RESOLVING):
+            self.animation_handler.go_back_to_state_after_blocking = self.game_state
+            self.game_state = State.ANIMATIONS_RESOLVING
+            return
+
         if (self.game_state == State.HEROES_THINK):
             self.decision_manager.make_decisions()
             self.game_state = State.PLAYERS_ACT
@@ -192,15 +200,22 @@ class App:
                     self.card_manager.unselect_card(self.card_manager.selected_card)
                     self.game_state = State.PLAYERS_ACT
                     return
-            print("CHOOSING TARGETS")
             return
         
         if (self.game_state == State.CARD_PLAYED):
             # resolve card effect
             # Wait for animations et
             self.card_manager.resolve_card()
-            self.game_state = State.POST_PLAYED_ANIMS
+            self.game_state = State.ANIMATIONS_RESOLVING
+            self.animation_handler.go_back_to_state_after_blocking = State.RESOLVING_HERO_ACTIONS
             return
+        
+        if (self.game_state == State.RESOLVING_HERO_ACTIONS):
+            self.room_manager.current_turn+=1
+            self.animation_handler.go_back_to_state_after_blocking = State.HEROES_THINK
+            self.game_state = State.ANIMATIONS_RESOLVING
+            self.hero_manager.resolve_decisions()
+
         # Heroes decide what to do
 
         # (Skipable animations?)
