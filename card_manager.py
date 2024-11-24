@@ -9,8 +9,9 @@
 
 import pyxel
 import random
-from decisions import HeroEnum, get_state
+from decisions import HeroEnum, get_state, Blind_Decision
 from game_manager import State
+
 LOREM = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus eget ex ac purus scelerisque suscipit ac ut turpis. Quisque ut massa posuere, ultrices nunc quis, sagittis tortor. Cras ac leo enim. Pellentesque ut viverra augue, et maximus orci. Ut non mollis elit. Donec sed feugiat ligula, ut rhoncus turpis. Nulla elementum a dui accumsan vulputate. Praesent sem lacus, dignissim id eros vitae, ultricies volutpat quam. Etiam non vehicula ex. "
 (CARD_W, CARD_H) = (60, 90)
 MIN_W = 10
@@ -46,8 +47,11 @@ class CardManager():
         
     def add_new_card_to_hand(self, timer=0.6):
         # Get new card?
-        basic_cards = [NecroBoltCard(), InstillFear(), Annoy()]
-        chosen_card = random.choice(basic_cards)
+        basic_cards = [NecroBoltCard(), InstillFear(), Annoy(), Blindness(), MassBlindness()]
+        if random.random() < 0.1:
+            chosen_card = ReaperScythe()
+        else:
+            chosen_card = random.choice(basic_cards)
         card : Card = chosen_card
 
         # Add it to the collection
@@ -109,7 +113,7 @@ class CardManager():
                 # Draw highlight around player:
                 if (self.is_mouse_in_space(pyxel.mouse_x, pyxel.mouse_y, self.OBJECT_SLOTS[i])):
                     return True, i
-        return False
+        return False, 0
     def unselect_card(self, card):
         place_index = 0
         self.cards_in_hand.insert(place_index, card)
@@ -324,7 +328,22 @@ class NecroBoltCard(Card):
     def resolve_card(self):
         # Hero takes 1 wound
         # He speaks sth?
-        self.card_target_player.get_wound()
+        self.card_target_player.get_wound(2)
+        self.card_manager.selected_card = None
+
+class ReaperScythe(Card):
+    def __init__(self):
+        super().__init__()
+        self.name = "Reaper Scythe"
+        self.description = "Kills player in a porly develop game. Can resurect dead players"
+        self.choose_targets = True
+        self.can_target_players = True
+        self.description = split_text_into_lines(self.description, CARD_W-4)
+    
+    def resolve_card(self):
+        # Hero takes 1 wound
+        # He speaks sth?
+        self.card_target_player.is_dead = not self.card_target_player.is_dead
         self.card_manager.selected_card = None
 
 class InstillFear(Card):
@@ -339,7 +358,7 @@ class InstillFear(Card):
     def resolve_card(self):
         # Hero takes 1 wound
         # He speaks sth?
-        self.card_target_player.get_fear()
+        self.card_target_player.get_fear(2)
         self.card_manager.selected_card = None
 
 class Annoy(Card):
@@ -354,9 +373,42 @@ class Annoy(Card):
     def resolve_card(self):
         # Hero takes 1 wound
         # He speaks sth?
-        self.card_target_player.get_anger()
+        self.card_target_player.get_anger(2)
         self.card_manager.selected_card = None
         
+class Blindness(Card):
+    def __init__(self):
+        super().__init__()
+        self.name = "Blindness"
+        self.description = "Blind character and force him to lose it's actions"
+        self.choose_targets = True
+        self.can_target_players = True
+        self.description = split_text_into_lines(self.description, CARD_W-4)
+    
+    def resolve_card(self):
+        # Hero takes 1 wound
+        # He speaks sth?
+        blind_decision = Blind_Decision()
+        self.card_target_player.decision = blind_decision
+        self.card_manager.selected_card = None
+        # BLINDNESS ANIM???
+
+class MassBlindness(Card):
+    def __init__(self):
+        super().__init__()
+        self.name = "Mass Blindness"
+        self.description = "Blind all characters causing chaos in the room"
+        self.choose_targets = False
+        self.can_target_players = False
+        self.description = split_text_into_lines(self.description, CARD_W-4)
+    
+    def resolve_card(self):
+        # Hero takes 1 wound
+        # He speaks sth?
+        for hero in self.card_manager.hero_manager.hero_list.values():
+            blind_decision = Blind_Decision()
+            hero.decision = blind_decision
+
 class SkipCard(Card):
     def __init__(self):
         super().__init__()

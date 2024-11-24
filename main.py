@@ -114,6 +114,7 @@ class App:
         if self.game_state == State.GAME_ENDED:
             self.draw_end_screen()
             return
+        self.draw_dev_opstions()
         self.draw_hud()
         # Draw players zone
         self.draw_players_zone()
@@ -142,7 +143,12 @@ class App:
                 if pixel_color == color:
                     # Draw a scaled version of the pixel
                     pyxel.rect(x + i * scale, y + j * scale, scale, scale, color)
-
+    def draw_dev_opstions(self):
+        pyxel.text(0,2,"- DEV OPTIONS -", 3)
+        pyxel.text(0,9,"[Q] : Quit game", 3)
+        pyxel.text(0,9+8,"[R] : Restart game", 3)
+        pyxel.text(0,9+16,"[T] : Go to next room", 3)
+        pyxel.text(0,9+24,"[SPACE] : Skip animation", 3)
     def draw_end_screen(self):
         alive_heroes = self.hero_manager.alive_heroes_num()
         text = ""

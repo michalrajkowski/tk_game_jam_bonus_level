@@ -47,6 +47,13 @@ class AnimationHandler():
             self.blocking_anim_queue.append(animation)
         else:
             self.not_blocking_anim_queue.append(animation)
+    def push_front_anim(self, animation, blocking=False):
+        animation.animation_manager = self
+        animation.room_manager = self.room_manager
+        if blocking:
+            self.blocking_anim_queue.insert(0,animation)
+        else:
+            self.not_blocking_anim_queue.insert(0,animation)
     def remove_anim(self, animation):
         try:
             self.blocking_anim_queue.remove(animation)
@@ -124,6 +131,15 @@ class EndTurnAnimation(Animation):
         anim = StartTurnAnimation(1.0, 0,0)
         self.animation_manager.add_anim(anim, True)
         # Add animation that will reveal screen?
+
+class ShootAnimation(Animation):
+    def __init__(self, max_time, x, y, size=5, color=1, anim_element=None):
+        super().__init__(max_time, x, y, anim_element)
+        self.size = size
+        self.color = color
+
+    def draw_animation(self):
+        pyxel.rectb(self.x, self.y, self.size, self.size, self.color)
 
 class StartTurnAnimation(Animation):
     def __init__(self, max_time, x, y, size=5, color=1, anim_element=None):

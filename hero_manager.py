@@ -59,7 +59,8 @@ class HeroManager():
         
     def resolve_decisions(self):
         for hero in self.hero_list.values():
-            hero.resolve_decisions(self)
+            if not hero.is_dead:
+                hero.resolve_decisions(self)
     def alive_heroes_num(self):
         alive = 3
         for hero in self.hero_list.values(): 
@@ -92,6 +93,8 @@ class Hero():
         )
     
     def resolve_decisions(self, hero_handler):
+        print("Resolving decision")
+        print(self.decision)
         self.decision.resolve(self, hero_handler)
 
     def set_decision(self, decision : Decision):
@@ -118,17 +121,25 @@ class Hero():
         # Select description
         description = random.choice(description_box[HeroEnum.DEFAULT])
         
-        # Add animation
-        self.animation_handler.add_anim(
-            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
-            True
-        )
-        self.animation_handler.add_anim(
-            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Blood", 8),
-            True
-        )
+        if self.current_stats[HeroStats.BLOOD] < 10:
+            # Add animation
+            self.animation_handler.add_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+                True
+            )
+            self.animation_handler.add_anim(
+                StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Blood", 8),
+                True
+            )
+        else:
+        # I cant take it anymore
+            self.animation_handler.add_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], "It is so cold in here.... *starts closing eyes*"),
+                True
+            )
+            self.is_dead = True
 
-    def say(self, str):
+    def say(self, str, push = False):
         # Get hero position
         hero_pos = self.PLAYER_SLOTS[self.hero_type.value]
         
@@ -136,10 +147,16 @@ class Hero():
         description = str
         
         # Add animation
-        self.animation_handler.add_anim(
-            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
-            True
-        )
+        if push == False:
+            self.animation_handler.add_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+                True
+            )
+        else:
+            self.animation_handler.push_front_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+                True
+            )
 
     def play_anim(self, animation, blocking=False):
         self.animation_handler.add_anim(
@@ -167,14 +184,22 @@ class Hero():
         description = random.choice(description_box[HeroEnum.DEFAULT])
         
         # Add animation
-        self.animation_handler.add_anim(
-            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
-            True
-        )
-        self.animation_handler.add_anim(
-            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Anger", 9),
-            True
-        )
+        if self.current_stats[HeroStats.ANGER] < 10:
+            self.animation_handler.add_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+                True
+            )
+            self.animation_handler.add_anim(
+                StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Anger", 9),
+                True
+            )
+        else:
+        # I cant take it anymore
+            self.animation_handler.add_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], "I can't take it any longer... *heart starts to beat super fast*"),
+                True
+            )
+            self.is_dead = True
 
 
     def get_fear(self, value=1):
@@ -199,13 +224,19 @@ class Hero():
         description = random.choice(description_box[HeroEnum.DEFAULT])
         
         # Add animation
-        self.animation_handler.add_anim(
-            TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
-            True
-        )
-        self.animation_handler.add_anim(
-            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Fear", 2),
-            True
-        )
-
-            
+        if self.current_stats[HeroStats.FEAR] < 10:
+            self.animation_handler.add_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
+                True
+            )
+            self.animation_handler.add_anim(
+                StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Fear", 2),
+                True
+            )
+        else:
+            # I cant take it anymore
+            self.animation_handler.add_anim(
+                TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], "I can't take it any longer... *starts crying*"),
+                True
+            )
+            self.is_dead = True
