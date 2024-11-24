@@ -42,3 +42,9 @@ Lich Dungeon
 # more cards?
 
 # More options (depending on room content?)
+
+--------------------------------------------
+# Losing stats anim for players?
+# more actions
+# player can die?
+# 

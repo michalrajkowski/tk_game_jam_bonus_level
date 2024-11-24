@@ -26,11 +26,11 @@ def pixelize_image(input_path, output_path, target_width, target_height):
 # Example usage
 if __name__ == "__main__":
     # Input and output paths
-    input_image = "assets/original_images/wizard/ending_3.png"  # Replace with your input image path
-    output_image = "assets/pixelized_images/ending_3.png"  # Replace with your desired output path
+    input_image = "assets/original_images/wizard/dead_player.png"  # Replace with your input image path
+    output_image = "assets/pixelized_images/dead_player.png"  # Replace with your desired output path
 
     # Desired resolution (e.g., 32x32 pixels)
-    target_width = 100
-    target_height = 100
+    target_width = 40
+    target_height = 60
 
     pixelize_image(input_image, output_image, target_width, target_height)

@@ -5,11 +5,12 @@ from room_manager import RoomManager
 import random
 
 class DecisionManager():
-    def __init__(self):
+    def __init__(self, game_manager):
         self.hero_manager : HeroManager = None
         self.animation_handler : AnimationHandler = None
         self.room_manager : RoomManager = None
         self.PLAYER_SLOTS = None
+        self.game_manager = game_manager
         pass
 
     def make_decisions(self):
@@ -18,9 +19,15 @@ class DecisionManager():
         
         # For each hero:
         # MAKE DECISION:
+        dead_count = 0
         for key, value in self.hero_manager.hero_list.items():
-            self.make_decision(value)    
-    
+            if value.is_dead:
+                dead_count+=1
+            else:
+                self.make_decision(value)    
+        if dead_count == 3:
+            # end game
+            self.game_manager.end_game()
     def make_decision(self, hero : Hero):
         decisions = []
         

@@ -21,6 +21,7 @@ WIZARD_IMAGES = []
 WARIOR_IMAGE = []
 ROGUE_IMAGES = []
 DUNGEON_BACKGROUND = []
+DEAD_PLAYER = []
 
 HUD_ZONE_H = 50
 OBJECT_ZONE_H = 80 
@@ -57,9 +58,9 @@ class App:
         print("INITIALIZE")
         self.load_hero_sprites()
         self.current_frame = 0.0
-
+        self.force_game_end = False
         self.game_state = State.HEROES_THINK
-        self.decision_manager : DecisionManager = DecisionManager()
+        self.decision_manager : DecisionManager = DecisionManager(self)
         self.card_manager : CardManager = CardManager(self)
         self.animation_handler : AnimationHandler = AnimationHandler()
         self.room_manager : RoomManager = RoomManager(self.animation_handler, self)
@@ -87,19 +88,23 @@ class App:
         self.animation_handler.go_back_to_state_after_blocking = State.HEROES_THINK
     
     def end_game(self):
+        self.force_game_end = True
         self.game_state = State.GAME_ENDED
     
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
+        
+        if pyxel.btnp(pyxel.KEY_R):
+            self.initialize_game()
+        if self.force_game_end == True:
+            self.game_state = State.GAME_ENDED
 
         if self.game_state== State.GAME_ENDED:
             return
         self.current_frame += 1.0
         self.animation_handler.do_one_frame()
         self.simulate_turn() 
-        if pyxel.btnp(pyxel.KEY_R):
-            self.initialize_game()
 
     def draw(self):
         pyxel.cls(0)
@@ -175,6 +180,10 @@ class App:
         pyxel.images[1].load(0, 0, "assets/pixelized_images/dng_wall.png")
         DUNGEON_BACKGROUND.append((0,0,150,20))
 
+        pyxel.images[2].load(40, 0, "assets/pixelized_images/dead_player.png")
+        DEAD_PLAYER.append((40,0,40, 60))
+
+
     def draw_heroes(self):
         # Draw individual heroes inside it
         #pyxel.rect(HERO_SLOTS[0][0], HERO_SLOTS[0][1], HERO_SIZE[0], HERO_SIZE[1], 5)
@@ -185,16 +194,39 @@ class App:
                   , 1, dungeon_background[0],dungeon_background[1],dungeon_background[2],dungeon_background[3], 0, scale=2.0)
 
         # Simple resize anim?
-        wizard_sprite = WIZARD_IMAGES[0]
-        pyxel.blt(HERO_SLOTS[0][0], HERO_SLOTS[0][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
-        # pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 0, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3])
+        if self.hero_manager.hero_list[HeroEnum.WIZARD].is_dead == True:
+            wizard_sprite = DEAD_PLAYER[0]
+            pyxel.blt(HERO_SLOTS[0][0], HERO_SLOTS[0][1]+20, 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+        else:
+            wizard_sprite = WIZARD_IMAGES[0]
+            pyxel.blt(HERO_SLOTS[0][0], HERO_SLOTS[0][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+            # pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 0, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3])
+         # Simple resize anim?
+        
+        if self.hero_manager.hero_list[HeroEnum.ROGUE].is_dead == True:
+            wizard_sprite = DEAD_PLAYER[0]
+            pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1]+20, 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+        else:
+            wizard_sprite = ROGUE_IMAGES[0]
+            pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+            # pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 0, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3])
+         # Simple resize anim?
+        
+        if self.hero_manager.hero_list[HeroEnum.WARRIOR].is_dead == True:
+            wizard_sprite = DEAD_PLAYER[0]
+            pyxel.blt(HERO_SLOTS[2][0], HERO_SLOTS[2][1]+20, 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+        else:
+            wizard_sprite = WARIOR_IMAGE[0]
+            pyxel.blt(HERO_SLOTS[2][0], HERO_SLOTS[2][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
+            # pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 0, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3])
 
+        """
         wizard_sprite = ROGUE_IMAGES[0]
         pyxel.blt(HERO_SLOTS[1][0], HERO_SLOTS[1][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
 
         wizard_sprite = WARIOR_IMAGE[0]
         pyxel.blt(HERO_SLOTS[2][0], HERO_SLOTS[2][1], 2, wizard_sprite[0],wizard_sprite[1],wizard_sprite[2],wizard_sprite[3], 0)
-
+        """
 
         # Draw heroes decisions (later icons might be used for this as well?)
         hero_manager = self.hero_manager
