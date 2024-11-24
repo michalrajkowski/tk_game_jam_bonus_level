@@ -12,7 +12,7 @@ from hero_manager import HeroManager
 from room_manager import RoomManager, Room
 from card_manager import CardManager
 from game_manager import State
-from animation_handler import AnimationHandler
+from animation_handler import AnimationHandler, BoxAnimation
 
 # CONSTANTS:
 # Box - x, y, w, h
@@ -51,6 +51,7 @@ class App:
         self.hero_manager : HeroManager = HeroManager()
         self.room_manager : RoomManager = RoomManager()
         self.card_manager : CardManager = CardManager(self)
+        self.animation_handler : AnimationHandler = AnimationHandler()
 
         self.decision_manager.hero_manager = self.hero_manager
         self.card_manager.SCREEN_W = SCREEN_W
@@ -61,6 +62,14 @@ class App:
         self.card_manager.HERO_SIZE = HERO_SIZE
         self.card_manager.hero_manager = self.hero_manager
         self.card_manager.room_manager = self.room_manager
+        self.animation_handler.game_manager = self
+        
+        self.game_state = State.ANIMATIONS_RESOLVING
+        self.animation_handler.go_back_to_state_after_blocking = State.HEROES_THINK
+        self.animation_handler.add_anim(BoxAnimation(5.0, 10, 10, 40, 2), True)
+        self.animation_handler.add_anim(BoxAnimation(5.0, 40, 10, 40, 3), True)
+        self.animation_handler.add_anim(BoxAnimation(5.0, 60, 10, 40, 4), True)
+
 
         pyxel.run(self.update, self.draw)
 
@@ -69,12 +78,14 @@ class App:
             pyxel.quit()
         self.current_frame += 1.0
         self.simulate_turn()
+        self.animation_handler.do_one_frame()
         # Simulate the turn?
         # - 
 
     def draw(self):
         pyxel.cls(0)
-        
+        # Draw animations
+        self.animation_handler.draw_animations()
         # Draw hud
         self.draw_hud()
         # Draw players zone
@@ -151,6 +162,10 @@ class App:
     def simulate_turn(self):
         # Enum turn step?
         # Additional thing for anims?
+        if (self.game_state == State.ANIMATIONS_RESOLVING):
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) or pyxel.btnp(pyxel.KEY_SPACE):
+                self.animation_handler.skip_current()
+
         if (self.game_state == State.HEROES_THINK):
             self.decision_manager.make_decisions()
             self.game_state = State.PLAYERS_ACT

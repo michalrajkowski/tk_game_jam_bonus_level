@@ -20,3 +20,9 @@ Lich Dungeon
 
 (E) Player card system?
 - effects on card play
+
+(F) Animation Handling?
+- animations queue
+- each is skipable with click / skip option
+- each frame it is pinged to simulate animation frame
+- if there are no animations, return priority?
