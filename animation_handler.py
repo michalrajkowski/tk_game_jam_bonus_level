@@ -96,6 +96,17 @@ class BoxAnimation(Animation):
     def draw_animation(self):
         pyxel.rectb(self.x, self.y, self.size, self.size, self.color)
 
+class StatIncreaseAnimation(Animation):
+    def __init__(self, max_time, x, y, text, color, anim_element=None):
+        super().__init__(max_time, x, y, anim_element)
+        self.text = text
+        self.color = color
+
+    def draw_animation(self):
+       max_offset_y = 15
+       offset_y = (1.0 - (self.current_time/self.max_time))* max_offset_y
+       pyxel.text(self.x, self.y +20 - offset_y, self.text, self.color)
+
 
 class EndTurnAnimation(Animation):
     def __init__(self, max_time, x, y, size=5, color=1, anim_element=None):

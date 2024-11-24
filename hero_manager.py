@@ -1,6 +1,6 @@
 from enum import Enum, auto
 from decisions import Decision, NoneDecision, HeroEnum
-from animation_handler import AnimationHandler, TalkAnimation
+from animation_handler import AnimationHandler, TalkAnimation, StatIncreaseAnimation
 import random 
 
 class HeroStats(Enum):
@@ -123,6 +123,9 @@ class Hero():
             TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
             True
         )
+        self.animation_handler.add_anim(
+            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Blood", 8)
+        )
 
     def say(self, str):
         # Get hero position
@@ -167,6 +170,9 @@ class Hero():
             TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
             True
         )
+        self.animation_handler.add_anim(
+            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Anger", 9)
+        )
 
 
     def get_fear(self, value=1):
@@ -194,6 +200,9 @@ class Hero():
         self.animation_handler.add_anim(
             TalkAnimation(1.0, hero_pos[0], hero_pos[1], hero_pos[2], description),
             True
+        )
+        self.animation_handler.add_anim(
+            StatIncreaseAnimation(1.5, hero_pos[0], hero_pos[1], f"+{value} Fear", 2)
         )
 
             
